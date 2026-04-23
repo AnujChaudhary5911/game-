@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: flappy-bird-neon
+    env: static
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

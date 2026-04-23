@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flappy Bird — Neon Edition</title>
+  <meta name="description" content="A stunning neon Flappy Bird game with smooth animations and modern UI."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- Animated background particles -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <!-- Main container -->
+  <div class="game-wrapper">
+
+    <!-- HUD: score + best -->
+    <div class="hud" id="hud">
+      <div class="hud-score">
+        <span class="hud-label">SCORE</span>
+        <span class="hud-value" id="scoreDisplay">0</span>
+      </div>
+      <div class="hud-score">
+        <span class="hud-label">BEST</span>
+        <span class="hud-value" id="bestDisplay">0</span>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start Screen -->
+    <div class="overlay" id="startScreen">
+      <div class="overlay-card">
+        <div class="bird-logo">🐦</div>
+        <h1 class="game-title">FLAPPY<br/><span>BIRD</span></h1>
+        <p class="game-subtitle">Neon Edition</p>
+        <div class="divider"></div>
+        <p class="hint-text">Press <kbd>SPACE</kbd> or <kbd>TAP</kbd> to flap</p>
+        <button class="btn-play" id="startBtn">
+          <span class="btn-icon">▶</span> PLAY NOW
+        </button>
+        <div class="controls-info">
+          <div class="control-item"><kbd>Space</kbd> Flap</div>
+          <div class="control-item"><kbd>↑</kbd> Flap</div>
+          <div class="control-item"><kbd>Tap</kbd> Flap</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div class="overlay hidden" id="gameOverScreen">
+      <div class="overlay-card gameover-card">
+        <div class="crash-icon">💥</div>
+        <h2 class="gameover-title">GAME OVER</h2>
+        <div class="score-board">
+          <div class="score-row">
+            <span>Score</span>
+            <span class="score-val" id="finalScore">0</span>
+          </div>
+          <div class="divider-thin"></div>
+          <div class="score-row best-row">
+            <span>Best</span>
+            <span class="score-val gold" id="finalBest">0</span>
+          </div>
+        </div>
+        <div class="medal-area" id="medalArea"></div>
+        <div class="btn-group">
+          <button class="btn-play" id="restartBtn">
+            <span class="btn-icon">↺</span> RETRY
+          </button>
+          <button class="btn-secondary" id="menuBtn">
+            ⌂ MENU
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Floating score popup (appears on pipe pass) -->
+  <div class="score-popup hidden" id="scorePopup">+1</div>
+
+  <script src="game.js"></script>
+</body>
+</html>
