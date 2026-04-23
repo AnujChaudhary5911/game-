@@ -620,32 +620,49 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── Touch: passive:false prevents browser paint flicker ──
+// ── Canvas touch — only canvas blocks default (no flicker, no scroll) ──
 canvas.addEventListener('touchstart', e => {
-  e.preventDefault(); // stops highlight + scroll
+  e.preventDefault();
   handleFlap();
 }, { passive: false });
 
-// Fallback for mouse (desktop)
+// Block scroll ONLY on canvas (not buttons!)
+canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+// Mouse fallback for desktop
 canvas.addEventListener('mousedown', e => {
   e.preventDefault();
   handleFlap();
 });
 
-// Block scroll/zoom on the whole document while game is open
-document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
-document.addEventListener('touchend',  e => e.preventDefault(), { passive: false });
+// ── Buttons — use touchend so they fire instantly on mobile ──
+// (avoids 300ms click delay without breaking anything)
+function addTouchBtn(el, fn) {
+  el.addEventListener('touchend', e => {
+    e.stopPropagation();
+    fn();
+  }, { passive: true });
+  el.addEventListener('click', fn); // desktop fallback
+}
 
-startBtn.addEventListener('click', () => {
-  startGame();
-});
+// ── Helper: instant touch for buttons ──
+function onBtn(el, fn) {
+  // touchstart fires immediately — no 300ms delay on phone
+  el.addEventListener('touchstart', e => {
+    e.stopPropagation(); // don't let canvas catch it
+    fn();
+  }, { passive: true });
+  el.addEventListener('click', fn); // desktop fallback
+}
 
-restartBtn.addEventListener('click', () => {
+onBtn(startBtn, () => startGame());
+
+onBtn(restartBtn, () => {
   gameOverScreen.classList.add('hidden');
   startGame();
 });
 
-menuBtn.addEventListener('click', () => {
+onBtn(menuBtn, () => {
   gameOverScreen.classList.add('hidden');
   state = 'idle';
   initGame();
