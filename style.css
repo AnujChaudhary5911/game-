@@ -26,14 +26,31 @@
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0; padding: 0;
+  /* Kill tap flicker on ALL elements */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
-html, body {
-  width: 100%; height: 100%;
+html {
+  height: 100%;
+  height: -webkit-fill-available;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
   background: var(--dark-bg);
   color: #e8f4fd;
   font-family: var(--font-ui);
+  /* Smooth rendering on mobile */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ── Background animated grid ── */
@@ -82,8 +99,14 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100vw; height: 100vh;
+  width: 100vw;
+  width: 100dvw;
+  height: 100vh;
+  height: 100dvh;
   z-index: 1;
+  /* Safe area insets for iPhone notch */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ── HUD ── */
@@ -139,6 +162,12 @@ body::before {
   cursor: pointer;
   position: relative;
   z-index: 5;
+  /* Prevent flicker on touch */
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  /* GPU-accelerated layer */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* ── Overlays ── */
@@ -464,8 +493,23 @@ body::before {
 
 /* ── Responsive ── */
 @media (max-width: 500px) {
-  .overlay-card { padding: 28px 22px; }
-  .game-title   { font-size: 28px; }
-  .hud-value    { font-size: 22px; }
-  .btn-play     { padding: 12px 28px; font-size: 12px; }
+  .overlay-card  { padding: 24px 18px; max-width: 92vw; }
+  .game-title    { font-size: 26px; }
+  .game-subtitle { font-size: 9px; letter-spacing: 3px; }
+  .hud-value     { font-size: 20px; }
+  .hud-score     { padding: 6px 16px; }
+  .hud           { gap: 20px; top: 10px; }
+  .btn-play      { padding: 12px 26px; font-size: 12px; }
+  .btn-secondary { padding: 10px 20px; font-size: 11px; }
+  #gameCanvas    { border-radius: var(--radius-md); }
+}
+
+/* Landscape mobile — fit in one screen */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hud           { top: 6px; }
+  .hud-score     { padding: 4px 14px; }
+  .hud-value     { font-size: 18px; }
+  .overlay-card  { padding: 16px 24px; }
+  .game-title    { font-size: 22px; }
+  .bird-logo     { font-size: 36px; margin-bottom: 4px; }
 }

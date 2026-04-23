@@ -47,9 +47,13 @@ const bgParticles   = document.getElementById('bgParticles');
 //  CANVAS SIZING
 // ─────────────────────────────────────────────────────────────
 function resizeCanvas() {
-  const maxH = window.innerHeight - 90;
-  const maxW = window.innerWidth  - 32;
-  const scale = Math.min(maxW / CFG.CANVAS_W, maxH / CFG.CANVAS_H, 1);
+  // Use dvh when available for true mobile fullscreen
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const hudH = vh < 600 ? 60 : 90;
+  const maxH = vh - hudH;
+  const maxW = vw - 16;
+  const scale = Math.min(maxW / CFG.CANVAS_W, maxH / CFG.CANVAS_H);
   canvas.width  = CFG.CANVAS_W;
   canvas.height = CFG.CANVAS_H;
   canvas.style.width  = Math.floor(CFG.CANVAS_W * scale) + 'px';
@@ -524,14 +528,23 @@ function showGameOver() {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  MAIN GAME LOOP
+//  MAIN GAME LOOP — smooth delta time with moving average
 // ─────────────────────────────────────────────────────────────
 let lastTime = 0;
+const dtHistory = [16.67, 16.67, 16.67]; // prime the pump
+
+function smoothDt(raw) {
+  dtHistory.push(raw);
+  if (dtHistory.length > 5) dtHistory.shift();
+  return dtHistory.reduce((a, b) => a + b, 0) / dtHistory.length;
+}
 
 function gameLoop(ts) {
   if (!lastTime) lastTime = ts;
-  const dt = Math.min((ts - lastTime) / 16.67, 3); // normalized to 60fps
+  const rawDt = ts - lastTime;
   lastTime = ts;
+  // Smooth out spikes (tab switch, GC pause etc.)
+  const dt = Math.min(smoothDt(rawDt), 33.33) / 16.67;
 
   frameCount++;
 
@@ -607,10 +620,21 @@ document.addEventListener('keydown', e => {
   }
 });
 
-canvas.addEventListener('pointerdown', e => {
+// ── Touch: passive:false prevents browser paint flicker ──
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault(); // stops highlight + scroll
+  handleFlap();
+}, { passive: false });
+
+// Fallback for mouse (desktop)
+canvas.addEventListener('mousedown', e => {
   e.preventDefault();
   handleFlap();
 });
+
+// Block scroll/zoom on the whole document while game is open
+document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+document.addEventListener('touchend',  e => e.preventDefault(), { passive: false });
 
 startBtn.addEventListener('click', () => {
   startGame();
